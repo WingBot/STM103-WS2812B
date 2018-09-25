@@ -24,7 +24,7 @@
   */
 int main(void)
 {
-	  //int i;
+	  int i;
 	  /* Configure one bit for preemption priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	  delay_ms(500);
@@ -37,7 +37,7 @@ int main(void)
 			  WS_SetAll();
         LED_SPI_Update(WsDat,LED_Num);
 
-				delay_ms(25);
+				delay_ms(10);
 			
 			/*
 				WS_SetAll_1();
@@ -52,7 +52,7 @@ int main(void)
 //				WS_SetAll();
 //				delay_ms(500);
 //			}
-//						
+						
 		}	  
 }
 

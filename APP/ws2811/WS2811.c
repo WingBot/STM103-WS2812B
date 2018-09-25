@@ -1,6 +1,6 @@
 #include "WS2811.h"
 #include "sys.h"
-uint16_t PixelBuffer[328] = {0};
+uint16_t PixelBuffer[1024] = {0};
 uint16_t PixelPointer = 0;
 
 void LED_SPI_LowLevel_Init(void)
@@ -14,6 +14,8 @@ void LED_SPI_LowLevel_Init(void)
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_SPI1, ENABLE);
 
+		//DMA数据传输的配置
+		//通过STM参考手册可以查到SPI的TX使用的DMA1_CH3通道
     DMA_DeInit(DMA1_Channel3);
     DMA_InitStructure.DMA_BufferSize = 0;
     DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & (SPI1->DR);
@@ -36,7 +38,8 @@ void LED_SPI_LowLevel_Init(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
     GPIO_Init(GPIOA, &GPIO_InitStructure); 
 		*/
-
+		//前两句就可以看出，我们将SPI配置成了主模式下的单线发送模式
+		//采用了16微数据帧格式，时钟引脚悬空未用，片选引脚未用。
 
     SPI_I2S_DeInit(SPI1);
 
@@ -55,7 +58,7 @@ void LED_SPI_LowLevel_Init(void)
 
     SPI_Cmd(SPI1, ENABLE);
 
-    for (i = 0; i < 328; i++)
+    for (i = 0; i < 1024; i++)
     {
         PixelBuffer[i] = 0xAAAA;
     }

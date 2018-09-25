@@ -40,7 +40,7 @@
 #define GPIOE_IDR_Addr    (GPIOE_BASE+8) //0x40011808 
 #define GPIOF_IDR_Addr    (GPIOF_BASE+8) //0x40011A08 
 #define GPIOG_IDR_Addr    (GPIOG_BASE+8) //0x40011E08 
-#define LED_Num    				20					   //灯珠数量
+#define LED_Num    				16					   //灯珠数量
  
 //IO口操作,只对单一的IO口!
 //确保n的值小于16!

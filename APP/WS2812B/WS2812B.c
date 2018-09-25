@@ -12,7 +12,10 @@
 #include "sys.h"
 /* 显存 */                //R  G  B
 
-unsigned long WsDat[nWs]={0x0000EE,0x0000CC,0x0000AA,0x000088,0x000066,0x000044};
+//unsigned long WsDat[nWs]={0x0000EE,0x0000CC,0x0000AA,0x000088,0x000066,0x000044};
+//unsigned long WsDat[nWs]={0x0000EE,0x0000CC,0x0000AA};
+
+unsigned long WsDat[nWs]={0x00AAAA,0x000000,0x00AAAA,0x00AAAA,0x00AAAA,0x00AAAA};
 
 /*
 unsigned long WsDat[nWs]={0x000000,0x000000,0x000000,0xAAAA00,
@@ -121,13 +124,13 @@ void WS_SetAll()
 	unsigned char j;
 	unsigned long temp;
 
-	/*
-	for(j=0; j<nWs; j++)
-	{
-		WS_Set1(WsDat[j]);  // j / 0
-	}
-	WS_Reset();									//固定显示
-*/
+
+//	for(j=0; j<nWs; j++)
+//	{
+//		WS_Set1(WsDat[j]);  // j / 0
+//	}
+//	WS_Reset();									//固定显示
+
 	    
 	{
 		temp=WsDat[0];
