@@ -1,5 +1,6 @@
 #include "WS2811.h"
 #include "sys.h"
+uint16_t BufferSize=1024;
 uint16_t PixelBuffer[1024] = {0};
 uint16_t PixelPointer = 0;
 
@@ -58,7 +59,7 @@ void LED_SPI_LowLevel_Init(void)
 
     SPI_Cmd(SPI1, ENABLE);
 
-    for (i = 0; i < 1024; i++)
+    for (i = 0; i < BufferSize; i++)
     {
         PixelBuffer[i] = 0xAAAA;
     }
@@ -66,35 +67,32 @@ void LED_SPI_LowLevel_Init(void)
     PixelPointer = 0;
 
 }
-
+//处理SPI模拟RGB的0和1，写到缓存数组中
+// zero = 0x7000;  //111000000000000,代表ws2812灯珠的24bit的0
+// one = 0x7F00;   //111111100000000,代表ws2812灯珠的24bit的1
 void LED_SPI_WriteByte(uint16_t Data)
 {
-    /* Wait until the transmit buffer is empty */
-    /*
-    while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET)
-    {
-    }
-    */
-
     PixelBuffer[PixelPointer] = Data;
     PixelPointer++;
 
-    /* Send the byte */
-    /* SPI_I2S_SendData16(SPI1, Data); */
 }
 
+//按R,G,B三色分开发送
 void LED_SPI_SendBits(uint8_t bits)
 {
-    int zero = 0x7000;  //111000000000000
-    int one = 0x7F00;  //111111100000000
+		//SPI的MOSI引脚，利用MO功能，通过发送一个字节或者半字的数据，来模拟LED控制信号的0或1
+    int zero = 0x7000;  //111000000000000,代表ws2812灯珠的24bit的0
+    int one = 0x7F00;   //111111100000000,代表ws2812灯珠的24bit的1
     int i = 0x00;
-
     for (i = 0x80; i >= 0x01; i >>= 1)
     {
+				//0x80 = 1000 0000
+				//(bits & i)按位与，之后从8bit 转成 16bit 的zero和one
+				//RGB的每1bit需要2byte(16b)写到缓存数组中
         LED_SPI_WriteByte((bits & i) ? one : zero);
     }
 }
-
+//每个灯珠如何发送颜色数组
 void LED_SPI_SendPixel(uint32_t color)
 {
     /*
@@ -111,24 +109,29 @@ void LED_SPI_SendPixel(uint32_t color)
     	BUG Fix : Actual is GRB,datasheet is something wrong.
     */
 	  uint8_t Red, Green, Blue;  // 三原色
-		// 绿 红 蓝 三原色分解
-	  Red   = color>>16;
-	  Green = color>>8;
-	  Blue  = color;
+	// 绿 红 蓝 三原色分解color，0XAA11BB，r:AA(170),g:11(17),b:BB(187)
+	//
+	  Red   = color>>16; //得到AA
+	  Green = color>>8;	//得到11
+	  Blue  = color;		//得到BB
     LED_SPI_SendBits(Green);
     LED_SPI_SendBits(Red);
     LED_SPI_SendBits(Blue);
 }
 
+//LED灯珠更新函数
+//参数：LED颜色数组，LED灯珠总数
 void LED_SPI_Update(unsigned long buffer[], uint32_t length)
 {
     uint8_t i = 0;
 //    uint8_t m = 0;
-    if(DMA_GetCurrDataCounter(DMA1_Channel3) == 0)
-    {
 
+    if(DMA_GetCurrDataCounter(DMA1_Channel3) == 0)	//判断当前传输是否完成
+    {
+				//按灯珠每个Pixel进行发送
 				for(i = 0; i < length; i++)
         {
+					//逐个发送
             LED_SPI_SendPixel(buffer[i]);
         }
 

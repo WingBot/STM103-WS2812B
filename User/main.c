@@ -37,7 +37,7 @@ int main(void)
 			  WS_SetAll();
         LED_SPI_Update(WsDat,LED_Num);
 
-				delay_ms(10);
+				delay_ms(20);
 			
 			/*
 				WS_SetAll_1();
